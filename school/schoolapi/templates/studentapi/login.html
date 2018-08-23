@@ -1,0 +1,137 @@
+<html>
+<head>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+<script type="text/javascript">
+
+    function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  }
+  var csrftoken = getCookie('csrftoken');
+
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+
+  function sameOrigin(url) {
+      // test that a given url is a same-origin URL
+      // url could be relative or scheme relative or absolute
+      var host = document.location.host; // host + port
+      var protocol = document.location.protocol;
+      var sr_origin = '//' + host;
+      var origin = protocol + sr_origin;
+      // Allow absolute or scheme relative URLs to same origin
+      return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+          (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+          // or any other URL that isn't scheme relative or absolute i.e relative.
+          !(/^(\/\/|http:|https:).*/.test(url));
+  }
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+              // Send the token to same-origin, relative URLs only.
+              // Send the token only if the method warrants CSRF protection
+              // Using the CSRFToken value acquired earlier
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
+
+    function login_user(){
+     var username = $("#username").val();
+        var password = $("#password").val();
+        console.log("username.:"+username);
+        var csrftoken = getCookie('csrftoken');
+        console.log(csrftoken)
+        $.ajax({
+               type: "POST",
+               url: "/login/",
+               data: {"username": username , "password" : password },
+               success: function(json){
+                 console.log(json);
+                 JSON.stringify(json); //to string
+                 alert(json.message);
+                 if(json.message == "success"){ // check whether response is received
+                     //location.window.href = "studentapi/home.html";
+                    //window.location =  "studentapi/home.html";
+                    window.open = "http://127.0.0.1:8000/schoolapi/home.html"
+                   }
+               }
+
+               });
+    }
+    </script>
+
+
+</head>
+
+<style>
+body {
+  background-image: linear-gradient(to left top, #17a2b8, #14abc4, #12b3d1, #11bcde, #12c5eb);
+  height: 100vh;
+}
+#login .container #login-row #login-column .login-box {
+  margin-top: 120px;
+  max-width: 600px;
+  height: 320px;
+  border: 1px solid #9C9C9C;
+  background-image: linear-gradient(to bottom, #aec1c3, #a9b5b7, #bcc5c6, #cfd5d5, #e3e5e5);
+}
+#login .container #login-row #login-column .login-box #login-form {
+  padding: 20px;
+}
+#login .container #login-row #login-column .login-box #login-form #register-link {
+  margin-top: -85px;
+}
+</style>
+
+<!--- Include the above in your HEAD tag ---------->
+
+<body>
+  {% csrf_token %}
+	<div id="login">
+    <h3 class="text-center text-black pt-5">Login form</h3>
+    <div class="container">
+        <div id="login-row" class="row justify-content-center align-items-center">
+            <div id="login-column" class="col-md-6">
+                <div class="login-box col-md-12">
+                    <form id="login-form" class="form" action="" method="post">
+                        <h3 class="text-center text-black">Login</h3>
+                        <div class="form-group">
+                            <label for="username" class="text-black">Username:</label><br>
+                            <input type="text" name="username" id="username" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="text-black">Password:</label><br>
+                            <input type="password" name="password" id="password" class="form-control">
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-lg" type="button" id="login" style="margin-left:40%;" onclick="login_user()">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
